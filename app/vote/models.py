@@ -1,48 +1,56 @@
 from django.db import models
 from users.models import UserModel
+    
 
-class BaseVoteFieldModel(models.Model):
-    """ 
-    Базовое модель поля голосования/опроса 
-    """
-    question = models.TextField(null=False)
-    vote = models.BooleanField() 
-
-class SurveyFormModel(models.Model):
-    """
-    Модель опроса
-    """
-    text_answer = models.TextField()
-    who_create = models.ForeignKey(UserModel,on_delete=models.CASCADE,null=False)
-
-class VotingFormModel(models.Model):
+class VoteModel(models.Model):
     """
     Модель голосования
     """
-    who_create = models.ForeignKey(UserModel,on_delete=models.CASCADE,null=False)
+    name = models.CharField(null=False)
+    who_create = models.ForeignKey(UserModel,models.CASCADE)
+    question = models.CharField(null=False)
 
-class VoteFieldModel(BaseVoteFieldModel):
+class VoteAnswerOption(models.Model):
     """
-    Модель вопрос -> голосование
+    Модель ответа для голосования
     """
-    vote_form = models.ForeignKey(VotingFormModel,on_delete=models.PROTECT)
+    choice = models.CharField(null=False)
+    answer = models.BooleanField(null=True)
+    vote_model = models.ForeignKey(VoteModel,models.PROTECT)
 
-class SurveyFieldModel(BaseVoteFieldModel):
+class SurveyModel(models.Model):
     """
-    Модель вопрос -> опрос
+    Модель опроса
     """
-    vote_form = models.ForeignKey(SurveyFormModel,on_delete=models.PROTECT)
+    name = models.CharField(null=False)
+    who_create = models.ForeignKey(UserModel,models.CASCADE)
 
-class SurveyUserRelationship(models.Model):
+class SurveyQuestionModel(models.Model):
     """
-    Модель юзер -> опрос
+    Модель вопроса для опроса
     """
-    survey = models.ForeignKey(SurveyFormModel,on_delete=models.CASCADE)
-    user = models.ForeignKey(UserModel,on_delete=models.CASCADE)
+    question = models.CharField(null=False)
+    survey = models.ForeignKey(SurveyModel,models.PROTECT)
+    free_answer = models.CharField(null=True)
 
-class VoteUserRelationship(models.Model):
+class SurveyAnswerOption(models.Model):
     """
-    Модель юзер -> голосование
+    Модель ответа для вопроса опроса
     """
-    vote = models.ForeignKey(VotingFormModel,on_delete=models.CASCADE)
-    user = models.ForeignKey(UserModel,on_delete=models.CASCADE)
+    choice = models.CharField(null=False)
+    answer = models.BooleanField(null=True)
+    question_survey_model = models.ForeignKey(SurveyQuestionModel,models.PROTECT)
+
+class VoteUser(models.Model):
+    """
+    Модель m-t-m Пользователь <-> Голосование
+    """
+    user = models.ForeignKey(UserModel,models.CASCADE)
+    vote = models.ForeignKey(VoteModel,models.CASCADE)
+
+class SurveyUser(models.Model):
+    """
+    Модель m-t-m Пользователь <-> опрос
+    """
+    user = models.ForeignKey(UserModel,models.CASCADE)
+    survey = models.ForeignKey(SurveyModel,models.CASCADE)
