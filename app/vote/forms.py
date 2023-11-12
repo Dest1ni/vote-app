@@ -7,22 +7,22 @@ class CreateVoteForm(forms.ModelForm):
         model = VoteModel
         fields = ['name','question'] 
 
-class CreateSurveyForm(forms.ModelForm):
-    class Meta:
-        model = SurveyModel
-        fields = ['name'] 
-
+#class CreateSurveyForm(forms.ModelForm):
+#    class Meta:
+#        model = SurveyModel
+#        fields = ['name'] 
+#
 class AddAnswerChoiceToVoteForm(forms.ModelForm):
     class Meta:
-        model = VoteAnswerOption
+        model = VoteOption
         fields = ['choice'] 
 
-class AddQestionToSurveyForm(forms.ModelForm):
-    class Meta:
-        model = SurveyQuestionModel
-        fields = ['question']
-
-class AddAnswerOptionToSurveyForm(forms.ModelForm):
-    class Meta:
-        model = SurveyAnswerOption
-        fields = ['choice']
+#class AddQestionToSurveyForm(forms.ModelForm):
+#    class Meta:
+#        model = SurveyQuestionModel
+#        fields = ['question']
+#
+#class AddAnswerOptionToSurveyForm(forms.ModelForm):
+#    class Meta:
+#        model = SurveyAnswerOption
+#        fields = ['choice']

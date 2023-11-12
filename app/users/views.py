@@ -5,7 +5,7 @@ from .models import UserModel
 from .forms import RegistrationForm
 
 class LoginView(BaseLoginView):
-    template_name = 'users/login.html'
+    template_name = 'users/auth/login.html'
 
 class LogoutView(BaseLogoutView):
     pass
@@ -13,5 +13,5 @@ class LogoutView(BaseLogoutView):
 class RegistrationView(CreateView):
     model = UserModel
     form_class = RegistrationForm
-    template_name = "users/registration.html"
+    template_name = "users/auth/registration.html"
     

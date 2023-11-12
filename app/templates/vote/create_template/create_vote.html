@@ -7,7 +7,7 @@
 {% block body %}
 <form method = "POST">
 {% csrf_token %}
-{{forms.as_p}}
+{{ form.as_p }}
 <button type='submit'>Создать голосование</button>
 </form>
 {% endblock body %}

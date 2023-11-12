@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}
+Мои голосования/опросы
+{% endblock title %}
+{% block body %}
+{% for vote in votes %}
+{{vote.pk}} <a href = "{% url 'vote:vote-detail' vote.pk %}"> {{vote.name}} </a> <br>
+{% empty %}
+Тут нет голосований или опросов
+{% endfor %}
+{% endblock body %}

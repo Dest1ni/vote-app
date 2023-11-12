@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}
+Голосование
+{% endblock title %}
+{% block body %}
+<h3>Название голосования:</h3> {{vote.name}}<br>
+<h3>Вопрос:</h3> {{vote.question}} <br><br>
+<h3>Варианты ответа:</h3>
+{% for option in options %}
+{{option.choice}} <br>
+{% empty %}
+Вариантов ответа нету :( <br> <br>
+{% endfor %}
+{% if not vote.for_everyone %}
+<form method="POST">
+{% csrf_token %}
+<button><a href= "#">Добавить пользователя</a></button>
+</form>
+<form method="POST">
+{% endif %}
+{% csrf_token %}
+<button><a href= "{% url 'vote:vote-choice' vote.pk %}">Добавить вариант ответа</a></button>
+</form>
+<form method="POST">
+{% csrf_token %}
+<button><a href= "#">Опубликовать голосование</a></button>
+</form>
+{% endblock body %}
