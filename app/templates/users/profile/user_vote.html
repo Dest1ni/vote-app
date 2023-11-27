@@ -12,17 +12,27 @@
 Вариантов ответа нету :( <br> <br>
 {% endfor %}
 {% if not vote.for_everyone %}
-<form method="POST">
+<form method="GET" action = "{% url 'vote:vote-user' vote.pk %}">
 {% csrf_token %}
-<button><a href= "#">Добавить пользователя</a></button>
+<button type = "submit">Добавить пользователя</button>
 </form>
+{% if vote.published == False %}
 <form method="POST">
 {% endif %}
 {% csrf_token %}
 <button><a href= "{% url 'vote:vote-choice' vote.pk %}">Добавить вариант ответа</a></button>
 </form>
-<form method="POST">
+{% endif %}
+{% if vote.published == False %}
+<form method="post" action = "{% url 'vote:vote-publish' vote.pk %}">
 {% csrf_token %}
-<button><a href= "#">Опубликовать голосование</a></button>
+<button type = "submit">Опубликовать голосование</button>
+</form>
+<form method="POST">
+{% else %}
+<h3><a href = "{% url 'vote:vote-published' vote.pk %}">Голосование Опубликовано </a></h3>
+{% endif %}
+{% csrf_token %}
+<button><a href= "{% url 'vote:vote-delete' vote.pk %}">Удалить голосование</a></button>
 </form>
 {% endblock body %}

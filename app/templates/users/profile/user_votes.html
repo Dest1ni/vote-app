@@ -3,6 +3,8 @@
 Мои голосования/опросы
 {% endblock title %}
 {% block body %}
+<button><a href = "{% url 'vote:vote-create' %}">Добавить новое голосование</a></button> <br>
+<button><a href = "{% url 'vote:vote-completed' %}">Список пройденных голосований</a></button> <br>
 {% for vote in votes %}
 {{vote.pk}} <a href = "{% url 'vote:vote-detail' vote.pk %}"> {{vote.name}} </a> <br>
 {% empty %}

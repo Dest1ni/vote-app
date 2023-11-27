@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block body %}
+{{survey.name}}<br>
+{% for question in questions %}
+{{question.question}} <br>
+{% empty %}
+У этого опроса нет вопросов
+{% endfor %}
+{% endblock body %}

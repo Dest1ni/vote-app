@@ -2,5 +2,9 @@
 {% block body %}
 Название голосования {{vote.name}} <br>
 Вопрос {{vote.question}} <br>
-
+<form method = "post">
+{% csrf_token %}
+{{form.as_p}}
+<button type = "submit">Подтвердить</button>
+</form>
 {% endblock body %}

@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     #my apps
 
     'vote.apps.VoteConfig',
-    'users.apps.UsersConfig'
+    'users.apps.UsersConfig',
+    'survey.apps.SurveyConfig',
 ]
 
 MIDDLEWARE = [
