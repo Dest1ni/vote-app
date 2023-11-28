@@ -24,6 +24,10 @@
 </form>
 {% endif %}
 {% if vote.published == False %}
+<form method = "POST">
+{% csrf_token %}
+<button><a href= "{% url 'vote:vote-update' vote.pk %}">Обновить голосование</a></button>
+</form>
 <form method="post" action = "{% url 'vote:vote-publish' vote.pk %}">
 {% csrf_token %}
 <button type = "submit">Опубликовать голосование</button>

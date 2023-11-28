@@ -8,6 +8,7 @@ from .forms import RegistrationForm
 class LoginView(BaseLoginView):
     template_name = 'users/auth/login.html'
     success_url = reverse_lazy("vote:vote-profile")
+    
 class LogoutView(BaseLogoutView):
     pass
 

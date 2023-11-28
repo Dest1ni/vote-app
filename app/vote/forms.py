@@ -1,6 +1,7 @@
 from collections.abc import Mapping
 from typing import Any
 from django import forms
+from django.forms.fields import Field
 from django.forms.utils import ErrorList
 from .models import *
 
@@ -45,4 +46,13 @@ class VoteAnswerForm(forms.Form):
 
 class AddUserToVoteForm(forms.Form):
     pk = forms.CharField(max_length=255)
+
+class UpdateVoteForm(forms.ModelForm):
+    name = forms.CharField(max_length=255,required = False)
+    for_everyone = forms.BooleanField(required = False)
+    rerunable = forms.BooleanField(required = False)
+    question = forms.CharField(max_length=255,required = False)
+    class Meta:
+        model = VoteModel
+        fields = ['name','for_everyone','rerunable','question']
     

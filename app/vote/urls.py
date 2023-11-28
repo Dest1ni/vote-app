@@ -13,4 +13,5 @@ urlpatterns = [
     path('vote/<int:pk>/',DetailVote.as_view(),name = "vote-published"),
     path('completed_votes/',CompletedVoteList.as_view(),name = "vote-completed"),
     path('add_user/<int:pk>',AddUsertoVote.as_view(),name = "vote-user"),
+    path('update/<int:pk>',UpdateVote.as_view(),name = "vote-update"),
 ]

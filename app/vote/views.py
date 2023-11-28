@@ -7,7 +7,7 @@ from django.forms.models import BaseModelForm
 from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from django.views.generic import CreateView,DetailView,ListView,DeleteView,FormView,View
+from django.views.generic import CreateView,DetailView,ListView,DeleteView,FormView,View,UpdateView
 from .forms import *
 from .models import *
 
@@ -218,18 +218,12 @@ class CompletedVoteList(LoginRequiredMixin,ListView):
         context =  super().get_context_data(**kwargs)
         context['votes'] = context['votes'].filter(user = self.request.user).all()
         return context
-    
-    #def get_paginator(self, queryset: QuerySet[Any], per_page: int, orphans: int = ..., allow_empty_first_page: bool = ..., **kwargs: Any) -> Paginator:
-    #    paginator = super().get_paginator(queryset, per_page, orphans, allow_empty_first_page, **kwargs)
-    #    print(paginator.)
-    #    return paginator
 
 class AddUsertoVote(LoginRequiredMixin,FormView):
     form_class = AddUserToVoteForm
     template_name = "vote/create_template/add_user_to_vote.html"
 
     def get(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
-        print(kwargs)
         return super().get(request, *args, **kwargs)
     
     def form_valid(self, form: Any) -> HttpResponse:
@@ -245,3 +239,23 @@ class AddUsertoVote(LoginRequiredMixin,FormView):
     
     def get_success_url(self) -> str:
         return reverse_lazy('vote:vote-detail', kwargs = {'pk':self.kwargs['pk']})
+
+class UpdateVote(LoginRequiredMixin,UpdateView):
+    model = VoteModel
+    form_class = UpdateVoteForm
+    template_name = "vote/update_vote.html"
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        vote = self.get_object()
+        if vote.who_create != self.request.user:
+            return HttpResponseBadRequest("У вас нет доступа к этому голосованию")
+        if vote.published:
+            return HttpResponseBadRequest("Нельзя обновить опубликованное голосование")
+        data = form.cleaned_data
+        if data['name'].strip() == '':
+            return HttpResponseBadRequest("Название не может быть пустым")
+        if data['question'].strip() == '':
+            return HttpResponseBadRequest("Название не может быть пустым")
+        return super().form_valid(form)
+    
+    def get_success_url(self) -> str:
+        return reverse_lazy("vote:vote-detail",kwargs = {"pk":self.get_object().pk})
