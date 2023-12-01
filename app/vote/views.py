@@ -33,20 +33,6 @@ class CreateVote(LoginRequiredMixin,CreateView):
     def get_success_url(self) -> str:
         return reverse_lazy("vote:vote-detail",kwargs = {'pk':self.object.pk})
 
-#class CreateSurvey(LoginRequiredMixin,CreateView):
-#
-#    login_url = reverse_lazy('users:users-login')
-#    # template_name =
-#    # success_url = reverse
-#
-#    form_class = CreateSurveyForm
-#
-#    def form_valid(self, form) -> HttpResponse:
-#        survey = form.save(commit=False)
-#        user = self.request.user
-#        survey.who_create = user
-#        survey.save()
-#        return super().form_valid(form)
 
 class AddOptionToVote(LoginRequiredMixin,CreateView):
 
@@ -71,32 +57,6 @@ class AddOptionToVote(LoginRequiredMixin,CreateView):
     def get_success_url(self) -> str:
         return reverse_lazy('vote:vote-detail',kwargs = {'pk':self.kwargs['pk']})
 
-#class AddQestionToSurvey(LoginRequiredMixin,CreateView):
-#
-#    # login_url = reverse
-#    # template_name =
-#    # success_url = reverse
-#
-#    form_class = AddQestionToSurveyForm
-#
-#    def form_valid(self, form: BaseModelForm) -> HttpResponse:
-#        question = form.save(commit=False)
-#        question.survey = self.kwargs['pk']
-#        question.save()
-#        return super().form_valid(form)
-
-#class AddAnswerOptionToSurveyQuestion(LoginRequiredMixin,CreateView):
-#    # login_url = reverse
-#    # template_name =
-#    # success_url = reverse
-#
-#    form_class = AddAnswerOptionToSurveyForm
-#
-#    def form_valid(self, form: BaseModelForm) -> HttpResponse:
-#        choice = form.save(commit = False)
-#        choice.question_survey_model = self.kwargs['pk']
-#        choice.save()
-#        return super().form_valid(form)
 
 class UserVotes(LoginRequiredMixin,ListView):
     model = VoteModel
@@ -139,7 +99,7 @@ class DeleteVote(LoginRequiredMixin,DeleteView):
             return HttpResponseBadRequest("У вас нет доступа к этому голосованию")
         return super().get(request, *args, **kwargs)
 
-class SearchVote(LoginRequiredMixin,FormView): # Реализовать
+class SearchVote(LoginRequiredMixin,FormView): # Реализовать как в ап6
     form_class = SeacrchVoteForm
     login_url = reverse_lazy('users:users-login')
 
@@ -152,11 +112,28 @@ class SearchVote(LoginRequiredMixin,FormView): # Реализовать
     def get_success_url(self) -> str:
         return reverse_lazy("vote:vote")
 
+class ListVote(LoginRequiredMixin,ListView):
+    model = VoteModel
+    template_name = "vote/list_vote.html"
+    context_object_name = "votes"
+    paginate_by = 5
+
+    #def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+    #    context = super().get_context_data(**kwargs)
+    #    votes = self.get_queryset()
+    #    context['votes'] = votes.order_by('name')
+    #    return context
+    
+    def get_queryset(self) -> QuerySet[Any]:
+        return VoteModel.objects.order_by('name')
+    
 class PublishVote(LoginRequiredMixin,View):
     login_url = reverse_lazy('users:users-login')
     def post(self, request, *args, **kwargs): # Щас бы jquery знать :(
         pk = self.kwargs['pk']
         vote = VoteModel.objects.get(pk = pk)
+        if len(VoteOption.objects.filter(vote_model = vote).all()) <= 1:
+            return HttpResponseBadRequest("Нельзя выставить голосование с одним или без вариантов ответа")
         if self.request.user.pk != vote.who_create.pk:
             return HttpResponseBadRequest("У вас нет доступа к этому голосованию")
         else:
@@ -212,12 +189,10 @@ class CompletedVoteList(LoginRequiredMixin,ListView):
     login_url = reverse_lazy('users:users-login')
     template_name = "users/profile/completed_vote.html"
     context_object_name = "votes"
-    #paginate_by = 3 Не хочет пагинировать объекты т.к они проходят фильтрацию в дальнейшем
- 
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context =  super().get_context_data(**kwargs)
-        context['votes'] = context['votes'].filter(user = self.request.user).all()
-        return context
+    paginate_by = 3
+
+    def get_queryset(self) -> QuerySet[Any]:
+        return VoteAnswer.objects.filter(user = self.request.user).all()
 
 class AddUsertoVote(LoginRequiredMixin,FormView):
     form_class = AddUserToVoteForm
@@ -259,3 +234,26 @@ class UpdateVote(LoginRequiredMixin,UpdateView):
     
     def get_success_url(self) -> str:
         return reverse_lazy("vote:vote-detail",kwargs = {"pk":self.get_object().pk})
+    
+
+class UpdateVoteOption(LoginRequiredMixin,UpdateView):
+    model = VoteOption
+    fields = ['choice']
+    template_name = "vote/update_template/update_option.html"
+
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        vote = self.get_object().vote_model
+        if vote.who_create != self.request.user:
+            return HttpResponseBadRequest("У вас нет доступа к этому голосованию")
+        if vote.published:
+            return HttpResponseBadRequest("Нельзя обновить опубликованное голосование")
+        data = form.cleaned_data
+        if data['choice'].strip() == '':
+            return HttpResponseBadRequest("Вариант не может быть пустым")
+        
+        return super().form_valid(form)
+    
+    def get_success_url(self) -> str:
+        option = self.get_object()
+        vote_model = option.vote_model
+        return reverse_lazy("vote:vote-detail",kwargs = {"pk":vote_model.pk})

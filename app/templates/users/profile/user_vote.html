@@ -6,37 +6,64 @@
 <h3>Название голосования:</h3> {{vote.name}}<br>
 <h3>Вопрос:</h3> {{vote.question}} <br><br>
 <h3>Варианты ответа:</h3>
-{% for option in options %}
-{{option.choice}} <br>
-{% empty %}
-Вариантов ответа нету :( <br> <br>
-{% endfor %}
-{% if not vote.for_everyone %}
-<form method="GET" action = "{% url 'vote:vote-user' vote.pk %}">
-{% csrf_token %}
-<button type = "submit">Добавить пользователя</button>
-</form>
-{% if vote.published == False %}
-<form method="POST">
-{% endif %}
-{% csrf_token %}
-<button><a href= "{% url 'vote:vote-choice' vote.pk %}">Добавить вариант ответа</a></button>
-</form>
-{% endif %}
-{% if vote.published == False %}
-<form method = "POST">
-{% csrf_token %}
-<button><a href= "{% url 'vote:vote-update' vote.pk %}">Обновить голосование</a></button>
-</form>
-<form method="post" action = "{% url 'vote:vote-publish' vote.pk %}">
-{% csrf_token %}
-<button type = "submit">Опубликовать голосование</button>
-</form>
-<form method="POST">
+
+{% if vote.published %}
+
+    {% for option in options %}
+    {{option.choice}} <br>
+    {% empty %}
+    Вариантов ответа нету :( <br> <br>
+    {% endfor %}
+
 {% else %}
-<h3><a href = "{% url 'vote:vote-published' vote.pk %}">Голосование Опубликовано </a></h3>
+
+    {% for option in options %}
+    {{option.choice}} <a href = "{% url 'vote:vote-option-update' option.pk %}">Изменить вариант ответа</a> <br>
+    {% empty %}
+    Вариантов ответа нету :( <br> <br>
+    {% endfor %}
+
 {% endif %}
-{% csrf_token %}
-<button><a href= "{% url 'vote:vote-delete' vote.pk %}">Удалить голосование</a></button>
-</form>
+
+{% if not vote.for_everyone %}
+
+    <form method="GET" action = "{% url 'vote:vote-user' vote.pk %}">
+        {% csrf_token %}
+        <button type = "submit">Добавить пользователя</button>
+    </form>
+
+{% endif %}
+
+{% if vote.published == False %}
+
+    <form method="post">
+        {% csrf_token %}
+        <button><a href= "{% url 'vote:vote-choice' vote.pk %}">Добавить вариант ответа</a></button>
+    </form>
+
+{% endif %}
+
+{% if vote.published == False %}
+
+    <form method = "POST">
+    {% csrf_token %}
+        <button><a href= "{% url 'vote:vote-update' vote.pk %}">Обновить голосование</a></button>
+    </form>
+    <form method="post" action = "{% url 'vote:vote-publish' vote.pk %}">
+        {% csrf_token %}
+        <button type = "submit">Опубликовать голосование</button>
+    </form>
+    
+
+{% else %}
+
+    <h3><a href = "{% url 'vote:vote-published' vote.pk %}">Голосование Опубликовано </a></h3>
+
+{% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <button><a href= "{% url 'vote:vote-delete' vote.pk %}">Удалить голосование</a></button>
+    </form>
+
 {% endblock body %}

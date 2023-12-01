@@ -1,13 +1,12 @@
 {% extends "base.html" %}
 {% block body %}
-{% for vote in votes  %}
-<p>____________________________________________</p>
-Голосование: <a href = "{% url 'vote:vote-published' vote.option.vote_model.pk %}">{{vote.option.vote_model.name}} </a><br>
-Ваш выбор: {{vote.option.choice}} 
-{% empty %}
-<h1>Вы не прошли никакие голосования</h1>
+{% for vote in votes %}
+<p>_______________</p>
+Название: {{vote.name}} <br>
+Вопрос: {{vote.question}}<br>
+Сделано {{vote.who_create.username}}<br>
+Для всех {{vote.for_everyone}} Перепроходимый {{vote.rerunable}}
 {% endfor %}
-{% if votes %}
 <div class="pagination">
     <span class="step-links">
         {% if page_obj.has_previous %}
@@ -25,5 +24,4 @@
         {% endif %}
     </span>
 </div>
-{% endif %}
 {% endblock body %}
